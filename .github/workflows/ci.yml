@@ -11,32 +11,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Скачиваем код репозитория
+      # 1. Скачиваем актуальный код репозитория
       - name: Checkout repository code
         uses: actions/checkout@v4
 
-      # 2. Проверяем синтаксис docker-compose.yml перед сборкой
+      # 2. Быстрая проверка синтаксиса конфигурации docker-compose
       - name: Verify Docker Compose configuration
         run: docker compose config
 
-      # 3. Запускаем сборку образов
-      - name: Build Docker images
-        run: docker compose build
-
-      # 4. Проверяем, что контейнеры успешно поднимаются
-      - name: Test Docker Compose up
+      # 3. Собираем и поднимаем контейнеры (принудительный билд игнорирует старый кэш)
+      - name: Build and Start Docker Containers
         run: |
-          docker compose up -d
-          echo "Ожидаем запуск контейнеров..."
-          sleep 5
-          docker compose ps
-      # 4. Проверяем, что контейнеры успешно поднимаются и проходят тесты
-      - name: Run Pytest inside Docker container
-        run: |
-          docker compose up -d
+          docker compose up -d --build
           echo "Ожидаем полную инициализацию приложения..."
           sleep 5
-          
-          # Запускаем pytest внутри контейнера с именем 'web'
-          # Флаг -T отключает псевдо-TTY (нужно для работы в CI системах)
+          docker compose ps
+
+      # 4. Запускаем тесты внутри свежесобранного контейнера
+      - name: Run Pytest inside Docker container
+        run: |
           docker compose exec -T web pytest
