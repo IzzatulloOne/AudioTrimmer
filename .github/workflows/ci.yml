@@ -2,9 +2,9 @@ name: AudioTrimmer CI
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [ master, main, dev ]
   pull_request:
-    branches: [ master, main ]
+    branches: [ master, main, dev ]
 
 jobs:
   build-and-test:
@@ -19,7 +19,7 @@ jobs:
       - name: Verify Docker Compose configuration
         run: docker compose config
 
-      # 3. Запускаем сборку образов (аналог твоей команды)
+      # 3. Запускаем сборку образов
       - name: Build Docker images
         run: docker compose build
 
