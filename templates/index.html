@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root {
+            --bg: #1a1a1a;
+            --panel: #262626;
+            --accent: #4a90e2;
+            --text: #e0e0e0;
+        }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; padding-top: 50px; }
+        .container { background: var(--panel); padding: 30px; border-radius: 8px; width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        h2 { margin-top: 0; font-weight: 500; font-size: 1.2rem; }
+        label { display: block; margin: 15px 0 5px; font-size: 0.85rem; color: #aaa; }
+        input[type="file"], input[type="text"] { 
+            width: 100%; padding: 10px; box-sizing: border-box; 
+            background: #333; border: 1px solid #444; color: white; border-radius: 4px; 
+        }
+        button { 
+            width: 100%; margin-top: 25px; padding: 12px; background: var(--accent); 
+            border: none; border-radius: 4px; color: white; font-weight: bold; cursor: pointer;
+        }
+        button:hover { background: #357abd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Media Trimmer</h2>
+        <form action="/trim" method="post" enctype="multipart/form-data">
+            <label>ФАЙЛ</label>
+            <input type="file" name="file" required>
+
+            <label>НАЧАЛО (чч:мм:сс)</label>
+            <input type="text" name="start_time" value="00:00:00" required>
+
+            <label>КОНЕЦ (чч:мм:сс)</label>
+            <input type="text" name="end_time" value="00:00:15" required>
+
+            <button type="submit">ОБРЕЗАТЬ И СКАЧАТЬ</button>
+        </form>
+    </div>
+</body>
+</html>

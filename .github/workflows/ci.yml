@@ -1,0 +1,28 @@
+name: Имя твоего пайплайна (например, Node/Python/PHP CI)
+
+# 1. Триггеры: когда запускать автоматизацию
+on:
+  push:
+    branches: [ main, master ] # Укажи свою главную ветку
+  pull_request:
+    branches: [ main, master ]
+
+# 2. Задачи, которые нужно выполнить
+jobs:
+  build-and-test:
+    # На каком сервере GitHub запускать (ubuntu-latest — самый оптимальный и бесплатный вариант)
+    runs-on: ubuntu-latest
+
+    # Шаги, выполняемые внутри задачи
+    steps:
+      # Шаг 1: Клонируем репозиторий внутрь контейнера раннера
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      # Шаг 2: Пример вывода в консоль
+      - name: Run a one-line script
+        run: echo "Пайплайн успешно запущен на серверах GitHub!"
+
+      # Шаг 3: Здесь обычно идет установка зависимостей и тесты
+      # Например, для Node.js: run: npm install && npm test
+      # Например, для Python: run: pip install -r requirements.txt && pytest
