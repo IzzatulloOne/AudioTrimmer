@@ -30,3 +30,13 @@ jobs:
           echo "Ожидаем запуск контейнеров..."
           sleep 5
           docker compose ps
+      # 4. Проверяем, что контейнеры успешно поднимаются и проходят тесты
+      - name: Run Pytest inside Docker container
+        run: |
+          docker compose up -d
+          echo "Ожидаем полную инициализацию приложения..."
+          sleep 5
+          
+          # Запускаем pytest внутри контейнера с именем 'web'
+          # Флаг -T отключает псевдо-TTY (нужно для работы в CI системах)
+          docker compose exec -T web pytest
