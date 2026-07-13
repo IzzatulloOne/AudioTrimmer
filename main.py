@@ -15,8 +15,9 @@ def remove_file(path: str):
 
 @app.get("/", response_class=HTMLResponse)
 async def read_index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
-
+    # Явно передаем request в именованный параметр
+    return templates.TemplateResponse(request=request, name="index.html")
+    
 @app.post("/trim")
 async def trim_media(
     file: UploadFile,
