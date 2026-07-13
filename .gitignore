@@ -1,0 +1,38 @@
+# Зависимости (тяжелый хлам, который pnpm качает сам)
+node_modules/
+.pnpm-store/
+
+# Сборка Next.js и кэш
+.next/
+out/
+.docusaurus/
+dist/
+
+# Логи ошибок (если pnpm или node упадут, они не попадут в гит)
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Секреты и ключи (КРИТИЧЕСКИ ВАЖНО: никогда не пушь это на GitHub)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env.local
+
+# Тесты и покрытие кодом
+coverage/
+.vitest-root/
+
+# Системный мусор Windows / Mac / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
