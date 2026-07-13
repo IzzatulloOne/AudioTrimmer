@@ -1,28 +1,32 @@
-name: Имя твоего пайплайна (например, Node/Python/PHP CI)
+name: AudioTrimmer CI
 
-# 1. Триггеры: когда запускать автоматизацию
 on:
   push:
-    branches: [ main, master ] # Укажи свою главную ветку
+    branches: [ master, main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ master, main ]
 
-# 2. Задачи, которые нужно выполнить
 jobs:
   build-and-test:
-    # На каком сервере GitHub запускать (ubuntu-latest — самый оптимальный и бесплатный вариант)
     runs-on: ubuntu-latest
 
-    # Шаги, выполняемые внутри задачи
     steps:
-      # Шаг 1: Клонируем репозиторий внутрь контейнера раннера
+      # 1. Скачиваем код репозитория
       - name: Checkout repository code
         uses: actions/checkout@v4
 
-      # Шаг 2: Пример вывода в консоль
-      - name: Run a one-line script
-        run: echo "Пайплайн успешно запущен на серверах GitHub!"
+      # 2. Проверяем синтаксис docker-compose.yml перед сборкой
+      - name: Verify Docker Compose configuration
+        run: docker compose config
 
-      # Шаг 3: Здесь обычно идет установка зависимостей и тесты
-      # Например, для Node.js: run: npm install && npm test
-      # Например, для Python: run: pip install -r requirements.txt && pytest
+      # 3. Запускаем сборку образов (аналог твоей команды)
+      - name: Build Docker images
+        run: docker compose build
+
+      # 4. Проверяем, что контейнеры успешно поднимаются
+      - name: Test Docker Compose up
+        run: |
+          docker compose up -d
+          echo "Ожидаем запуск контейнеров..."
+          sleep 5
+          docker compose ps
