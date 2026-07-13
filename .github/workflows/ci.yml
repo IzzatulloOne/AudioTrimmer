@@ -29,5 +29,4 @@ jobs:
 
       # 4. Запускаем тесты внутри свежесобранного контейнера
       - name: Run Pytest inside Docker container
-        run: |
-          docker compose exec -T web pytest
+        run: docker compose exec -T web python -m pytest
