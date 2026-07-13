@@ -39,3 +39,5 @@ def test_trim_media_missing_parameters():
             data={}
         )
         assert response.status_code == 422
+
+print(1)
