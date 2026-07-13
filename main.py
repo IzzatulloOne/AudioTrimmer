@@ -5,9 +5,19 @@ from fastapi import FastAPI, UploadFile, Form, Request
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.background import BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://barakasoft.uz"], # или список разрешенных доменов
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def remove_file(path: str):
     if os.path.exists(path):
@@ -17,7 +27,7 @@ def remove_file(path: str):
 async def read_index(request: Request):
     # Явно передаем request в именованный параметр
     return templates.TemplateResponse(request=request, name="index.html")
-    
+
 @app.post("/trim")
 async def trim_media(
     file: UploadFile,

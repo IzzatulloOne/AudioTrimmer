@@ -1,8 +1,11 @@
 services:
-  web:
+  web: # FastAPI
     build: .
     ports:
       - "8000:8000"
-    volumes:
-      - .:/app
-    restart: unless-stopped
+  
+  frontend:
+    build: ./frontend
+    restart: always
+    expose:
+      - "3000"
