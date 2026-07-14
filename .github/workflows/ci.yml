@@ -1,32 +1,74 @@
-name: AudioTrimmer CI
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ master, main, dev ]
-  pull_request:
-    branches: [ master, main, dev ]
+    branches:
+      - main
+      - dev
 
 jobs:
+  # 1. СТАДИЯ: СБОРКА И ТЕСТИРОВАНИЕ
   build-and-test:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Скачиваем актуальный код репозитория
-      - name: Checkout repository code
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Быстрая проверка синтаксиса конфигурации docker-compose
-      - name: Verify Docker Compose configuration
-        run: docker compose config
+      # Тесты бэкенда
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-      # 3. Собираем и поднимаем контейнеры (принудительный билд игнорирует старый кэш)
-      - name: Build and Start Docker Containers
+      - name: Install backend dependencies
         run: |
-          docker compose up -d --build
-          echo "Ожидаем полную инициализацию приложения..."
-          sleep 5
-          docker compose ps
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest httpx fastapi starlette
 
-      # 4. Запускаем тесты внутри свежесобранного контейнера
-      - name: Run Pytest inside Docker container
-        run: docker compose exec -T web python -m pytest
+      - name: Run Backend Tests
+        run: |
+          python -m pytest
+
+      # Сборка фронтенда
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Install frontend dependencies and build
+        run: |
+          cd frontend
+          pnpm install --no-frozen-lockfile
+          pnpm build
+
+  # 2. СТАДИЯ: ДЕПЛОЙ НА СЕРВЕР (запустится только если build-and-test прошёл успешно)
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ~/projects/AudioTrimmer
+            
+            # Синхронизируем ветку (main или dev)
+            git fetch origin
+            git checkout ${{ github.ref_name }}
+            git pull origin ${{ github.ref_name }}
+            
+            # Перезапускаем контейнеры
+            docker compose up -d --build
+            
+            # Чистим мусор за сборщиком
+            docker image prune -f
+            docker builder prune -f
