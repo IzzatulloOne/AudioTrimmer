@@ -40,9 +40,11 @@ jobs:
         with:
           version: 11
 
+      # Явно заставляем pnpm разрешить сборку msw и sharp прямо перед установкой
       - name: Install frontend dependencies and build
         run: |
           cd frontend
+          pnpm config set only-built-dependencies msw,sharp
           pnpm install --no-frozen-lockfile
           pnpm build
 
