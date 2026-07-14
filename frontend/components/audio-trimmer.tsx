@@ -484,7 +484,7 @@ export function AudioTrimmer() {
           <p className="mt-4 text-sm font-medium text-foreground">
             {loading ? "Декодирую аудио…" : "Перетащите аудиофайл сюда"}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">mp3 format m4a · ogg · flac</p>
+          <p className="mt-1 text-xs text-muted-foreground">mp3 formats dfdf   m4a · ogg · flac</p>
         </div>
       )}
 
