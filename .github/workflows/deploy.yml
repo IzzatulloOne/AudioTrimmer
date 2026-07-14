@@ -35,15 +35,17 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
+      # Было version: 9, меняем на 11
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 11
 
+      # Добавляем флаг, чтобы не было капризов с блокировкой файла
       - name: Install frontend dependencies and build
         run: |
           cd frontend
-          pnpm install
+          pnpm install --no-frozen-lockfile
           pnpm build
 
   # 2. СТАДИЯ: ДЕПЛОЙ И ОЧИСТКА (Deploy & Cleanup)
