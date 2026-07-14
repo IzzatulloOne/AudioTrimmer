@@ -7,14 +7,14 @@ on:
       - dev
 
 jobs:
-  # 1. СТАДИЯ: СБОРКА И ТЕСТИРОВАНИЕ
-  build-and-test:
+  # 1. СТАДИЯ: ТЕСТИРОВАНИЕ БЭКЕНДА
+  backend-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Тесты бэкенда
+      # Тесты бэкенда (работают стабильно и быстро)
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -29,30 +29,9 @@ jobs:
         run: |
           python -m pytest
 
-      # Сборка фронтенда
-      # Сборка фронтенда
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11
-
-      - name: Install frontend dependencies and build
-        env:
-          PNPM_CONFIG_ONLY_BUILT_DEPENDENCIES: msw,sharp
-          pnpm_config_only_built_dependencies: msw,sharp
-        run: |
-          cd frontend
-          pnpm install --no-frozen-lockfile
-          pnpm build
-
-  # 2. СТАДИЯ: ДЕПЛОЙ НА СЕРВЕР (запустится только если build-and-test прошёл успешно)
+  # 2. СТАДИЯ: ДЕПЛОЙ НА СЕРВЕР (запустится сразу после тестов бэкенда)
   deploy:
-    needs: build-and-test
+    needs: backend-test
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to Server via SSH
@@ -65,14 +44,14 @@ jobs:
           script: |
             cd ~/projects/AudioTrimmer
             
-            # Синхронизируем ветку (main или dev)
+            # Синхронизируем код на сервере
             git fetch origin
             git checkout ${{ github.ref_name }}
             git pull origin ${{ github.ref_name }}
             
-            # Перезапускаем контейнеры
+            # Docker сам соберёт фронтенд внутри контейнера без капризов pnpm
             docker compose up -d --build
             
-            # Чистим мусор за сборщиком
+            # Чистим кэш сборки
             docker image prune -f
             docker builder prune -f
