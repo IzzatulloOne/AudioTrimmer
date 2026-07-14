@@ -2,49 +2,73 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - dev
 
 jobs:
+  # 1. СТАДИЯ: ТЕСТИРОВАНИЕ И СБОРКА (Testing & Build Check)
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Проверка бэкенда
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          version: 9 # Или используй ту версию, что у тебя локально
-      
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
-          cache: 'pnpm'
+          python-version: '3.11'
 
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Frontend Tests
-        run: pnpm test
-
-      # Бэкенд тесты (если лежат в корне)
-      - name: Backend Tests
+      - name: Install backend dependencies
         run: |
-          docker run --rm -v ${{ github.workspace }}:/app python:3.11 \
-          bash -c "pip install pytest httpx && pytest /app/tests"
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest httpx fastapi starlette
 
+      - name: Run Backend Tests
+        run: |
+          python -m pytest
+
+      # Проверка фронтенда (собирается ли Next.js без ошибок)
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Install frontend dependencies and build
+        run: |
+          cd frontend
+          pnpm install
+          pnpm build
+
+  # 2. СТАДИЯ: ДЕПЛОЙ И ОЧИСТКА (Deploy & Cleanup)
   deploy:
-    needs: test
+    needs: test  # Деплой начнется только если тесты прошли успешно
     runs-on: ubuntu-latest
     steps:
-      - name: SSH Deploy
-        uses: appleboy/ssh-action@master
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
           script: |
             cd ~/projects/AudioTrimmer
-            git pull
-            pnpm install
-            pnpm build
-            docker compose build
-            docker compose up -d
+            
+            # Затягиваем изменения именно той ветки, в которую был пуш
+            git fetch origin
+            git checkout ${{ github.ref_name }}
+            git pull origin ${{ github.ref_name }}
+            
+            # Пересобираем и запускаем контейнеры в фоне
+            docker compose up -d --build
+            
+            # Очистка (Cleanup): удаляем кэш сборщика и старые зависшие образы, чтобы не забивать диск сервера
+            docker image prune -f
+            docker builder prune -f
