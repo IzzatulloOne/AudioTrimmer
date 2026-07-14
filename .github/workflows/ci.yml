@@ -42,11 +42,13 @@ jobs:
           version: 11
 
       - name: Install frontend dependencies and build
+            env:
+              PNPM_ONLY_BUILT_DEPENDENCIES: msw,sharp # Подстраховка для pnpm v11 в облаке
         run: |
           cd frontend
           pnpm install --no-frozen-lockfile
           pnpm build
-
+          
   # 2. СТАДИЯ: ДЕПЛОЙ НА СЕРВЕР (запустится только если build-and-test прошёл успешно)
   deploy:
     needs: build-and-test
