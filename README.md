@@ -1,5 +1,3 @@
-Готовый `README.md` с учётом монорепозитория, структуры проекта, pnpm-workspaces и демонстрации:
-
 ```markdown
 # AudioTrimmer
 
