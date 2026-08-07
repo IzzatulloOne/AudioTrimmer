@@ -123,7 +123,3 @@ docker compose logs -f
 ## 👤 Автор
 
 * **GitHub:** [@IzzatulloOne](https://www.google.com/search?q=https://github.com/IzzatulloOne)
-
-```
-
-```
