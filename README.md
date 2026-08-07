@@ -14,7 +14,7 @@
 
 ## 🎬 Демонстрация
 
-![AudioTrimmer Demo](./docs/demo.gif)
+
 
 ---
 
@@ -55,6 +55,8 @@ AudioTrimmer/
 └── README.md
 
 ```
+
+![AudioTrimmer Demo](./docs/demo.gif)
 
 ---
 
