@@ -1,3 +1,7 @@
+
+
+
+
 ```markdown
 # AudioTrimmer
 
@@ -56,7 +60,7 @@ AudioTrimmer/
 
 ```
 
-![AudioTrimmer Demo](./docs/demo.gif)
+https://github.com/user-attachments/assets/89ce8cd4-7adc-4808-bd91-1bc14a6f79b0
 
 ---
 
